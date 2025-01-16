@@ -6,7 +6,7 @@ exports[`InsightsCloudSync render 1`] = `
 >
   <Connect(InsightsSettings) />
   <PageLayout
-    beforeToolbarComponent={<InsightsHeader />}
+    beforeToolbarComponent={null}
     header="Red Hat Insights"
     onSearch={[Function]}
     searchProps={
