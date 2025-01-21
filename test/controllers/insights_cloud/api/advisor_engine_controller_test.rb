@@ -26,6 +26,23 @@ module InsightsCloud
         assert_response :not_found
         assert_equal 'No hosts found for the given UUIDs', JSON.parse(response.body)['error']
       end
+
+      test 'test upload hits with payload' do
+        uuid = SecureRandom.uuid
+        payload = { "data": "dummy data" }
+        ForemanRhCloud::HitsUploader.any_instance.expects(:upload!).returns
+        patch :upload_hits, params: { host_name: @host1.name, host_uuid: uuid, payload: payload }
+        assert_response :ok
+        assert_equal 'success', JSON.parse(response.body)['action_status']
+      end
+
+      test 'test upload hits with bad host' do
+        uuid = SecureRandom.uuid
+        payload = { "data": "dummy data" }
+        patch :upload_hits, params: { host_name: "NO SUCH HOST", host_uuid: uuid, payload: payload }
+        assert_response :not_found
+        assert_equal 'No host found for the given host name', JSON.parse(response.body)['error']
+      end
     end
   end
 end
