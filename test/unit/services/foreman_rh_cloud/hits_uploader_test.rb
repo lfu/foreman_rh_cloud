@@ -96,4 +96,25 @@ class HitsUploaderTest < ActiveSupport::TestCase
     refute_nil fact_value
     assert_equal PAYLOAD[:details], fact_value.value
   end
+
+  test "empty payload" do
+    payload = {
+      resolutions: [],
+      rules: [],
+      hits: [],
+      details: "",
+    }
+
+    @host = FactoryBot.create(:host)
+    @uuid = SecureRandom.uuid
+    uploader = ForemanRhCloud::HitsUploader.new(host: @host, payload: payload, uuid: @uuid)
+    uploader.upload!
+    @host.reload
+    assert_equal @uuid, @host.insights_facet.uuid
+    assert_empty @host.insights_facet.hits
+    assert_equal 0, @host.insights_facet.hits_count
+    fact_name = FactName.where(name: "insights::hit_details").first
+    fact_value = @host.fact_values.where(fact_name: fact_name).first
+    assert_nil fact_value
+  end
 end
