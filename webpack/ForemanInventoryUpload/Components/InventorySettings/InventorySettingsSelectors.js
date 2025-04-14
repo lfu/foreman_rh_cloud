@@ -7,6 +7,9 @@ export const selectSettings = state =>
 export const selectAutoUploadEnabled = state =>
   selectSettings(state).autoUploadEnabled;
 
+export const selectSubscriptionConnectionEnabled = state =>
+  selectSettings(state).subscriptionConnectionEnabled;
+
 export const selectHostObfuscationEnabled = state =>
   selectSettings(state).hostObfuscationEnabled;
 

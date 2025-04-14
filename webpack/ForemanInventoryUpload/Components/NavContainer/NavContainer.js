@@ -1,4 +1,5 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import {
   TabContainer,
@@ -9,8 +10,10 @@ import {
   Icon,
   noop,
 } from 'patternfly-react';
+import { translate as __ } from 'foremanReact/common/I18n';
 import './navContainer.scss';
 import FullScreenModal from '../FullScreenModal';
+import { selectSubscriptionConnectionEnabled } from '../InventorySettings/InventorySettingsSelectors';
 
 const NavContainer = ({
   items,
@@ -18,8 +21,13 @@ const NavContainer = ({
   toggleFullScreen,
   terminalProps,
 }) => {
+  const subscriptionConnectionEnabled = useSelector(
+    selectSubscriptionConnectionEnabled
+  );
   const navItems = items.map((item, index) => {
     const { name, icon, onClick } = item;
+    if (name === __('Uploading') && !subscriptionConnectionEnabled) return null;
+
     return (
       <NavItem
         key={index}
