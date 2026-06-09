@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import PageTitle from '../PageTitle';
 
 let mockIopMode = false;
@@ -30,21 +30,25 @@ describe('PageTitle', () => {
   });
 
   it('renders the kebab dropdown', () => {
-    const { container } = render(<PageTitle />);
-    expect(container.querySelector('.title-dropdown')).toBeTruthy();
+    render(<PageTitle />);
+    expect(screen.getByLabelText('Actions')).toBeTruthy();
   });
 
-  it('renders cloud-ping dropdown item when not in IoP mode', () => {
+  it('renders cloud-ping dropdown item when not in IoP mode', async () => {
     mockIopMode = false;
     render(<PageTitle />);
-    fireEvent.click(screen.getByLabelText('Actions'));
+    await act(async () => {
+      fireEvent.click(screen.getByLabelText('Actions'));
+    });
     expect(screen.getByText('Connectivity test')).toBeTruthy();
   });
 
-  it('does not render cloud-ping dropdown item when in IoP mode', () => {
+  it('does not render cloud-ping dropdown item when in IoP mode', async () => {
     mockIopMode = true;
     render(<PageTitle />);
-    fireEvent.click(screen.getByLabelText('Actions'));
+    await act(async () => {
+      fireEvent.click(screen.getByLabelText('Actions'));
+    });
     expect(screen.queryByText('Connectivity test')).toBeNull();
     mockIopMode = false;
   });

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid } from 'patternfly-react';
+import { Grid, GridItem } from '@patternfly/react-core';
 import InventorySettings from '../InventorySettings';
 import PageDescription from './components/PageDescription';
 import InventoryFilter from '../InventoryFilter';
@@ -22,14 +22,14 @@ const PageHeader = () => {
           <PageDescription />
         </div>
       )}
-      <Grid.Row>
-        <Grid.Col xs={4}>
+      <Grid>
+        <GridItem span={4}>
           <InventoryFilter />
-        </Grid.Col>
-        <Grid.Col xs={7} xsOffset={1}>
+        </GridItem>
+        <GridItem span={7} offset={1}>
           <ToolbarButtons />
-        </Grid.Col>
-      </Grid.Row>
+        </GridItem>
+      </Grid>
     </div>
   );
 };

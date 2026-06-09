@@ -127,7 +127,7 @@ module ForemanRhCloud
     facet&.host
   rescue ActiveRecord::StatementInvalid => e
     # Table might not exist yet during migrations
-    Rails.logger.debug("Could not query marked foreman host: #{e.message}")
+    Rails.logger.debug { "Could not query marked foreman host: #{e.message}" }
     nil
   end
 

@@ -2,11 +2,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  Table,
-  TableBody,
-  TableHeader,
-} from '@patternfly/react-table/deprecated';
+import { Table, Tbody, Tr, Td } from '@patternfly/react-table';
 import {
   Card,
   CardTitle,
@@ -21,6 +17,10 @@ import {
   CheckCircleIcon,
   ExclamationCircleIcon,
 } from '@patternfly/react-icons';
+import {
+  global_danger_color_200 as dangerColor,
+  global_success_color_100 as successColor,
+} from '@patternfly/react-tokens';
 import { get } from 'foremanReact/redux/API';
 import { translate as __, sprintf } from 'foremanReact/common/I18n';
 import { STATUS } from 'foremanReact/constants';
@@ -30,34 +30,22 @@ import { inventoryUrl } from '../../../../ForemanInventoryHelpers';
 export const API_KEY = 'CLOUD_PING';
 
 const CloudPingModal = ({ title, isOpen, toggle }) => {
-  const [rows, setRows] = useState([]);
+  const [certAuths, setCertAuths] = useState([]);
   const dispatch = useDispatch();
+  const status = useSelector(state => selectAPIStatus(state, API_KEY));
+  const isPending = status === STATUS.PENDING;
+
   const handleSuccess = useCallback(
     ({
       data: {
         ping: { cert_auth = [] },
       },
     }) => {
-      cert_auth.length &&
-        setRows(
-          cert_auth.map(cert => ({
-            cells: [
-              {
-                title: (
-                  <>
-                    <StatusIcon
-                      isPending={status === STATUS.PENDING}
-                      authStatus={cert}
-                    />{' '}
-                    {cert.org_name} {cert.error}
-                  </>
-                ),
-              },
-            ],
-          }))
-        );
+      if (cert_auth.length) {
+        setCertAuths(cert_auth);
+      }
     },
-    [status]
+    []
   );
 
   useEffect(() => {
@@ -70,10 +58,6 @@ const CloudPingModal = ({ title, isOpen, toggle }) => {
         })
       );
   }, [isOpen, dispatch, handleSuccess]);
-
-  const status = useSelector(state => selectAPIStatus(state, API_KEY));
-  const isPending = status === STATUS.PENDING;
-  // const error = useSelector(state => selectAPIErrorMessage(state, API_KEY));
 
   return (
     <>
@@ -97,17 +81,25 @@ const CloudPingModal = ({ title, isOpen, toggle }) => {
             ) : (
               <>
                 <Text className="pull-right" ouiaId="text-org-count">
-                  {sprintf(__('%s organizations'), rows.length)}
+                  {sprintf(__('%s organizations'), certAuths.length)}
                 </Text>
                 <Table
-                  aria-label="Simple Table"
+                  aria-label="Organization status"
                   ouiaId="simple-table"
-                  cells={['']}
-                  rows={rows}
+                  variant="compact"
+                  borders={false}
                 >
-                  <TableHeader />
-                  <TableBody />
-                </Table>{' '}
+                  <Tbody>
+                    {certAuths.map((cert, idx) => (
+                      <Tr key={cert.org_name || idx}>
+                        <Td dataLabel={__('Organization')}>
+                          <StatusIcon isPending={isPending} authStatus={cert} />{' '}
+                          {cert.org_name} {cert.error}
+                        </Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
               </>
             )}
           </CardBody>
@@ -121,13 +113,13 @@ const StatusIcon = ({ isPending, authStatus }) => {
   if (isPending) return <Spinner size="sm" />;
   if (authStatus.success)
     return (
-      <Icon color="green">
+      <Icon color={successColor.value}>
         <CheckCircleIcon />
       </Icon>
     );
   if (authStatus.error)
     return (
-      <Icon color="red">
+      <Icon color={dangerColor.value}>
         <ExclamationCircleIcon />
       </Icon>
     );
